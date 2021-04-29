@@ -36,6 +36,7 @@ parser.add_argument('--SNP', metavar='[str]', type = str, help = 'Name of SNP ID
 parser.add_argument('--p_threshold', metavar='[str]', type = str, help = 'P-value threshold for SNP inclusion')
 parser.add_argument('--statistic', metavar='[str]', type = str, help = 'Statistic for PES calculation, i.e. OR or beta')
 parser.add_argument('--P', metavar='[str]', type = str, help = 'Name of P-value column in the summary statistics')
+parser.add_argument('--target_type', metavar='[str]', type = str, help = 'Whether target phenotype is binary')
 inputFlags = parser.parse_args()
 
 print(inputFlags)
@@ -46,4 +47,4 @@ Popen(inputFlags.PRsice2_binary + """ --A1 """ + inputFlags.A1 + """ --A2 """ + 
      --bp """ + inputFlags.BP + """ --stat """ + inputFlags.statistic + """ --pvalue """ + inputFlags.P + """ --snp """ + inputFlags.SNP +  """ \
      --base """ + inputFlags.pathway_gwasfile + """ --bar-levels """ + inputFlags.p_threshold + """ --fastscore --model add --print-snp --perm 10000 \
      --pheno """ + inputFlags.phenotype_file + """ --ignore-fid --cov """ + inputFlags.covar_file + """ --prevalence """ + inputFlags.pop_prev + """ --target \
-     """ + inputFlags.bfile + """ --out """ + inputFlags.phenotype + """_""" + inputFlags.pathway, shell = True).wait()
+     """ + inputFlags.bfile + """ --binary-target """ + inputFlags.target_type + """ --out """ + inputFlags.phenotype + """_""" + inputFlags.pathway, shell = True).wait()
