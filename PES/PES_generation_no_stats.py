@@ -23,9 +23,6 @@ parser = argparse.ArgumentParser('Generation of PES profiles at a pre-specified 
 parser.add_argument('--pathway_gwasfile', metavar=['filename'], type = str, help = 'GWAS summary statistics for variants only in genes part of the pathway')
 parser.add_argument('--bfile', metavar='{prefix}', type = str, help = 'Target genotype files in plink binary format - .bed, .bim, .fam')
 parser.add_argument('--PRsice2_binary', metavar=['filename'],type = str, help = 'Binary executable for PRsice2')
-parser.add_argument('--phenotype_file', metavar=['filename'],type = str, help = 'File with phenotype information formatted for PRSice2')
-parser.add_argument('--covar_file', metavar=['filename'],type = str, help = 'File with covariate information formatted for PRSice2')
-parser.add_argument('--pop_prev', metavar='[str]',type = str, help = 'Population prevalence of the relevant phenotype')
 parser.add_argument('--phenotype', metavar='[str]', type = str, help = 'GWAS phenotype name')
 parser.add_argument('--pathway', metavar='[str]', type = str, help = 'Pathway_name')
 parser.add_argument('--A1', metavar='[str]', type = str, help = 'Name of the A1 allele column [effect allele] in the summary statistics')
@@ -45,6 +42,5 @@ print(inputFlags)
 
 Popen(inputFlags.PRsice2_binary + """ --A1 """ + inputFlags.A1 + """ --A2 """ + inputFlags.A2 + """ --chr """ + inputFlags.CHR + """ \
      --bp """ + inputFlags.BP + """ --stat """ + inputFlags.statistic + """ --pvalue """ + inputFlags.P + """ --snp """ + inputFlags.SNP +  """ \
-     --base """ + inputFlags.pathway_gwasfile + """ --bar-levels """ + inputFlags.p_threshold + """ --fastscore --model add --print-snp --perm 10000 \
-     --pheno """ + inputFlags.phenotype_file + """ --ignore-fid --cov """ + inputFlags.covar_file + """ --prevalence """ + inputFlags.pop_prev + """ --target \
+     --base """ + inputFlags.pathway_gwasfile + """ --bar-levels """ + inputFlags.p_threshold + """ --fastscore --model add --no-regress --print-snp --perm 10000 --target \
      """ + inputFlags.bfile + """ --binary-target """ + inputFlags.target_type + """ --out """ + inputFlags.phenotype + """_""" + inputFlags.pathway, shell = True).wait()
