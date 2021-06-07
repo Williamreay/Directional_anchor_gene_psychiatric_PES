@@ -11,7 +11,7 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(optparse))
 suppressMessages(library(dplyr))
 
-setwd("~/Desktop/SZ_PES_mtCOJO_norm/PES/")
+setwd("~/Desktop/SZ_PES_mtCOJO_norm/Best_DA_gene_PES/UKBB_MHQ_no_self_reported_biochem/")
 
 
 ##Specify command line inputs
@@ -30,14 +30,14 @@ print(opt)
 cat("\n")
 cat("#########################")
 cat("\n")
-cat("Constructing model to test the association of",  paste(opt$biochem_name, ' with ', opt$score_name, sep = ""))
+cat("Constructing model to test the association with ", paste(opt$score_name), sep = "")
 cat("\n")
 cat("#########################")
 cat("\n")
 
 ## Read in df
 
-Merged_biochem_data <- fread("")
+Merged_biochem_data <- fread("Merged_all_scores_all_biochem.txt")
 
 cat("\n")
 cat("#########################")
@@ -94,7 +94,7 @@ rownames(Output) <- Male_and_all
 Output$FDR <- p.adjust(Output$'Pr(>|t|)', method="fdr")
 
 
-write.table(Output, file = paste("UKBB_MHQ_no_self_reported_biochem/", opt$disorder_name, "_", 
+write.table(Output, file = paste("Combined_results/", opt$disorder_name, "_", 
                                  opt$score_name, ".txt", sep=""),
             sep = "\t", row.names = T, quote = F)
 
@@ -122,7 +122,7 @@ rownames(Male_output) <- Male_and_all
 
 Male_output$FDR <- p.adjust(Male_output$'Pr(>|t|)', method="fdr")
 
-write.table(Male_output, file = paste("UKBB_MHQ_no_self_reported_biochem/Sex_stratified/Male_", opt$disorder_name, "_", 
+write.table(Male_output, file = paste("Sex_stratified/Male_", opt$disorder_name, "_", 
                                  opt$score_name, ".txt", sep=""),
             sep = "\t", row.names = T, quote = F)
 
@@ -139,7 +139,7 @@ rownames(Female_output) <- Female
 Female_output$FDR <- p.adjust(Female_output$'Pr(>|t|)', method="fdr")
 
 
-write.table(Female_output, file = paste("UKBB_MHQ_no_self_reported_biochem/Sex_stratified/Female_", opt$disorder_name, "_", 
+write.table(Female_output, file = paste("Sex_stratified/Female_", opt$disorder_name, "_", 
                                       opt$score_name, ".txt", sep=""),
             sep = "\t", row.names = T, quote = F)
 
