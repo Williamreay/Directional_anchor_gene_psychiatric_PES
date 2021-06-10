@@ -85,7 +85,7 @@ Biochem_PES_PRS <- function(biochem_col, score_col, df) {
 
 Run_lm <- sapply(Male_and_all, Biochem_PES_PRS,  score_col=opt$score_col_id, df=Merged_biochem_data)
 
-Run_lm_extract <- apply(Run_lm, 2, function(x) return(as.data.frame(x$coefficients)[16, 1:4]))
+Run_lm_extract <- apply(Run_lm, 2, function(x) return(as.data.frame(x$coefficients)[15, 1:4]))
 
 Output <- data.frame()
 for (i in 1:length(Run_lm_extract)) {
@@ -94,6 +94,7 @@ for (i in 1:length(Run_lm_extract)) {
 rownames(Output) <- Male_and_all
 
 Output$FDR <- p.adjust(Output$'Pr(>|t|)', method="fdr")
+Output$Score <- opt$score_name
 
 
 write.table(Output, file = paste("Combined_results/", opt$disorder_name, "_", 
@@ -127,6 +128,8 @@ rownames(Male_output) <- Male_and_all
 
 Male_output$FDR <- p.adjust(Male_output$'Pr(>|t|)', method="fdr")
 
+Male_output$Score <- opt$score_name
+
 write.table(Male_output, file = paste("Sex_stratified/Male_", opt$disorder_name, "_", 
                                  opt$score_name, ".txt", sep=""),
             sep = "\t", row.names = T, quote = F)
@@ -143,6 +146,7 @@ rownames(Female_output) <- Female
 
 Female_output$FDR <- p.adjust(Female_output$'Pr(>|t|)', method="fdr")
 
+Female_output$Score <- opt$score_name
 
 write.table(Female_output, file = paste("Sex_stratified/Female_", opt$disorder_name, "_", 
                                       opt$score_name, ".txt", sep=""),

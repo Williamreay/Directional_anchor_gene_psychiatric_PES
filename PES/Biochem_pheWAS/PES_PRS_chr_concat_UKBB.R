@@ -92,7 +92,7 @@ write.table(SZ_RPS17_concat, file="../FINAL_SCORES_PES_PRS/SZ_RPS17_PES_UKBB.txt
 
 ##### BIP #####
 
-BIP_PRS_raw <- fread("UKBB_SZ_PRS_concatenated", header = T, sep="\t")
+BIP_PRS_raw <- fread("UKBB_BIP_PRS_concatenated", header = T, sep="\t")
 
 BIP_PRS_concat <- PES_concat(BIP_PRS_raw, "BIP_PRS")
 
