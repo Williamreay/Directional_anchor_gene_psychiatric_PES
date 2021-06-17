@@ -11,6 +11,9 @@
 library(data.table)
 library(dplyr)
 library(easyGgplot2)
+library(RNOmni)
+library(RColorBrewer)
+library(ggpubr)
 
 setwd("~/Desktop/SZ_PES_mtCOJO_norm/Best_DA_gene_PES/UKBB_MHQ_no_self_reported_biochem/")
 
@@ -145,12 +148,45 @@ for (i in 1:length(Run_statin_extract)) {
 write.table(S_output, file="Biochem_sensitivity_analyses/Statin_covariation_results.txt",
             sep = "\t", row.names = F, quote = F)
 
+## Inverse-rank normal transformation
+
+IRNT <- function(biochem_col, score_col, df) {
+  biochem_df <- df[!is.na(df[[biochem_col]]),]
+  biochem_df$scaled_score <- as.numeric(scale(biochem_df[[score_col]]))
+  fmla <- as.formula(paste(biochem_col," ~ Sex*Age + Age2"))
+  mod <- lm(fmla, data = biochem_df)
+  Biochem_resid <- as.numeric(mod$residuals)
+  ## Blom transformation
+  Biochem_residuals_NORMALISED <- as.data.frame(RankNorm(Biochem_resid), k=3/8)
+  biochem_df$Norm_resid <- Biochem_residuals_NORMALISED$'RankNorm(Biochem_resid)'
+  Resid_mod <- lm(Norm_resid ~ PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
+                    PC8 + PC9 + PC10 + scaled_score + Batch, data = biochem_df)
+  return(summary(Resid_mod))
+}
+
+Run_IRNT <- mapply(IRNT, biochem_col = All_testing, score_col=All_scores, 
+                     MoreArgs = list(Senstivity_merged),
+                     SIMPLIFY = TRUE)
+
+Run_IRNT_extract <- apply(Run_IRNT, 2, function(x) return(as.data.frame(x$coefficients)[12, 1:4]))
+
+IRNT_output <- data.frame()
+for (i in 1:length(Run_IRNT_extract)) {
+  IRNT_output <- rbind(IRNT_output, Run_IRNT_extract[[i]])
+}
+
+IRNT_output$Biochem <- unlist(All_testing)
+IRNT_output$Score <- unlist(All_scores)
+
+write.table(IRNT_output, file="Biochem_sensitivity_analyses/IRNT_results.txt",
+            sep = "\t", row.names = F, quote = F)
+
 ## Make barplot of deciles for HDL with each of the scores
 
 HDL_df <- Senstivity_merged %>% filter(!is.na(f.30760.0.0))
 
 HDL_df <- HDL_df %>% select(f.30760.0.0, SZ_FADS1_PES, BIP_FADS1_PES,
-                            SZ_PRS, BIP_PRS)
+                            SZ_PRS, BIP_PRS, Sex, Age2, Age)
 
 ## Scale scores
 
@@ -163,7 +199,7 @@ HDL_df <- HDL_df %>%
   mutate_at(vars(starts_with("BIP")), .funs = list(~ntile(.,10)))
 
 
-HDL_df <- rename(HDL_df, "HDL"="f.30760.0.0")
+HDL_df <- rename(HDL_df, "HDL"="HDL_IRNT")
 
 HDL_df <- HDL_df %>% filter(SZ_FADS1_PES == 1 | SZ_FADS1_PES == 5 |
                               SZ_FADS1_PES == 10)
@@ -185,31 +221,34 @@ HDL_df$BIP_PRS <- as.factor(HDL_df$BIP_PRS)
 
 ## Make plots
 
-ggplot(HDL_df) +
-  geom_boxplot(aes(x=BIP_PRS, y=HDL,
-                   fill = BIP_PRS)) +
+BIP_HDL <- ggplot(HDL_df, aes(x=BIP_FADS1_PES, y=f.30760.0.0, fill=BIP_FADS1_PES)) +
+  geom_boxplot() +
   theme_bw() +
-  xlab("Phenotype") +
-  ylab("Score") +
+  xlab("") +
+  ylab("HDL (mmol/L))") +
   labs(fill = "Score name") +
-  theme(legend.position = "bottom") +
-  geom_hline(yintercept = 0, linetype = "longdash")
+  theme(legend.position = "none") +
+  geom_hline(yintercept = 1.478, linetype = "longdash") +
+  scale_x_discrete(labels=c("1" = "10th percentile", "5" = "50th percentile",
+                            "10" = "90th percentile")) +
+  scale_fill_brewer(name = "Blues") +
+  ggtitle("BIP FADS1 PES - HDL")
 
-ggplot2.density(data=HDL_df, 
-                xName='HDL', groupName='BIP_FADS1_PES', 
-                alpha=0.5, fillGroupDensity=TRUE, addMeanLine=TRUE, meanLineColor="black", xtitle="HDL (mmol/L)", 
-                ytitle="Density", xtitleFont=c(12, "plain", "black"), ytitleFont=c(12, "plain", "black"), 
-                axisLine=c(0.5, "solid", "black"), xTickLabelFont=c(12, "plain", "black"), 
-                yTickLabelFont=c(12, "plain", "black"), backgroundColor="white", removePanelGrid=TRUE, 
-                faceting=TRUE, bins=30, facetingVarNames=c("1", "5", "10"), legendPosition="top",
-                densityAlpha=0.3, densityLineSize=4, groupColors=c('#999999','dodgerblue1', "red"))
+SZ_HDL <- ggplot(HDL_df, aes(x=SZ_FADS1_PES, y=f.30760.0.0,
+                             fill = SZ_FADS1_PES)) +
+  geom_boxplot() +
+  theme_bw() +
+  xlab("") +
+  ylab("HDL (mmol/L)") +
+  labs(fill = "Score name") +
+  theme(legend.position = "none") +
+  geom_hline(yintercept = 1.478, linetype = "longdash") +
+  scale_x_discrete(labels=c("1" = "10th percentile", "5" = "50th percentile",
+                            "10" = "90th percentile")) +
+  scale_fill_brewer(palette = "Blues") +
+  ggtitle("SZ FADS1 PES - HDL")
 
-ggplot(HDL_df, aes(x=HDL, fill=SZ_FADS1_PES)) +
-  geom_density(alpha=0.4) +
-  facet_wrap(~SZ_FADS1_PES, nrow = 3) +
-  theme(legend.position = "none")
 
-ggplot(HDL_df, aes(x=HDL, fill=BIP_PRS)) +
-  geom_density(alpha=0.4) +
-  facet_wrap(~BIP_PRS, nrow = 3) +
-  theme(legend.position = "none")
+HDL_all <- ggarrange(BIP_HDL, SZ_HDL)
+
+

@@ -12,6 +12,11 @@
 
 library(dplyr)
 library(data.table)
+library(easyGgplot2)
+library(corrplot)
+library(reshape2)
+library(ComplexHeatmap)
+library(circlize)
 
 
 setwd("~/Desktop/SZ_PES_mtCOJO_norm/Best_DA_gene_PES/UKBB_MHQ_self_reported_mental_illness/")
@@ -55,7 +60,7 @@ anova(Dep_test, test="Chisq")
 
 OCD <- Merged_MHQ_scoring %>% filter(No_mental_health == 0 | OCD == 1)
 
-OCD$SZ_RSP17_PES <- as.numeric(scale(OCD$SZ_RPS17_PES))
+OCD$SZ_RPS17_PES <- as.numeric(scale(OCD$SZ_RPS17_PES))
 OCD$SZ_PRS <- as.numeric(scale(OCD$SZ_PRS))
 
 OCD_test <- glm(OCD ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
@@ -76,3 +81,85 @@ BIP_test <- glm(Anx_nerves_or_GAD ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5
                 data = OCD)
 
 anova(BIP_test, test="Chisq")
+
+## Make heatmap of self-report Z scores
+
+Hm_input <- fread("Results/FDR_corrected_results.csv", header = T)
+
+Hm_input <- Hm_input %>% select(Z, Disorder, Score)
+
+Input <- dcast(Hm_input, Disorder ~ Score, value.var = "Z")
+
+Input_mat <- as.matrix(Input)
+
+rownames(Input_mat) <- c("ADHD", "Agoraphobia", "Anorexia nervosa",
+                         "Anxiety/GAD", "ASD", "Bulimia nervosa", 
+                         "Depression", "OCD", "Other phobia", "Other psychosis",
+                         "Over eating/binge eating", "Paniac attack", "Personality disorder",
+                         "Social anxiety/Social phobia")
+
+colnames(Input_mat) <- c("BIP CACNA1C PES", "BIP FADS1 PES",
+                         "BIP FES PES", "BIP GRIN2A PES", "BIP PCCB PES",
+                         "BIP PRS", "BIP RPS17 PES", "SZ CACNA1C PES",
+                         "SZ FADS1 PES", "SZ FES PES", "SZ GRIN2A PES",
+                         "SZ PCCB PES", "SZ PRS", "SZ RPS17 PES")
+                        
+
+Input_mat <- Input_mat[, -1]
+
+Input_mat <- `dimnames<-`(`dim<-`(as.numeric(Input_mat), dim(Input_mat)), dimnames(Input_mat))
+
+Pval_input <- Hm_input %>% select(Score, P, Disorder)
+
+P_Input <- dcast(Pval_input, Disorder ~ Score, value.var = "P")
+
+Input_P_mat <- as.matrix(P_Input)
+
+rownames(Input_P_mat) <- c("ADHD", "Agoraphobia", "Anorexia nervosa",
+                         "Anxiety/GAD", "ASD", "Bulimia nervosa", 
+                         "Depression", "OCD", "Other phobia", "Other psychosis",
+                         "Over eating/binge eating", "Paniac attack", "Personality disorder",
+                         "Social anxiety/Social phobia")
+
+Input_P_mat <- Input_P_mat[, -1]
+
+colnames(Input_P_mat) <- c("BIP CACNA1C PES", "BIP FADS1 PES",
+                         "BIP FES PES", "BIP GRIN2A PES", "BIP PCCB PES",
+                         "BIP PRS", "BIP RPS17 PES", "SZ CACNA1C PES",
+                         "SZ FADS1 PES", "SZ FES PES", "SZ GRIN2A PES",
+                         "SZ PCCB PES", "SZ PRS", "SZ RPS17 PES")
+
+
+Input_P_mat <- `dimnames<-`(`dim<-`(as.numeric(Input_P_mat), dim(Input_P_mat)), dimnames(Input_P_mat))
+
+corrplot(Input_mat, is.corr = F,tl.col = "black",
+        p.mat = Input_P_mat,
+        insig = "blank", tl.cex = 0.6, method = "square",
+        sig.level = c(0.005))
+
+Heatmap(Input_mat, name = "Z", rect_gp = gpar(col = "white", lwd = 2), 
+        show_column_dend = TRUE, show_row_dend = TRUE, clustering_distance_rows = "pearson",
+        row_dend_width = unit(1, "cm"),
+        row_names_gp = grid::gpar(fontsize = 8.5), column_names_gp = grid::gpar(fontsize = 7.5),
+        column_names_rot = 50, column_title_gp = grid::gpar(fontsize = 11.5, fontface="bold"),
+        cell_fun = function(j, i, x, y, w, h, fill) {
+          if(Input_mat[i, j] > 3.657) {
+            grid.text("***", x, y)
+          }
+          if(Input_mat[i, j] > 2.77 && Input_mat[i, j] < 3.657) {
+            grid.text("**", x, y)
+          }
+          if(Input_mat[i, j] > 1.96 && Input_mat[i, j] < 2.77) {
+            grid.text("*", x, y)
+          }
+        }
+        )
+
+
+Input <- `dimnames<-`(`dim<-`(as.numeric(Input), dim(Input)), dimnames(Input))
+
+
+
+
+
+
