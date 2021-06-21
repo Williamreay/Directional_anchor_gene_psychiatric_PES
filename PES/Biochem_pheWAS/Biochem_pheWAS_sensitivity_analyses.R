@@ -229,8 +229,8 @@ BIP_HDL <- ggplot(HDL_df, aes(x=BIP_FADS1_PES, y=f.30760.0.0, fill=BIP_FADS1_PES
   labs(fill = "Score name") +
   theme(legend.position = "none") +
   geom_hline(yintercept = 1.478, linetype = "longdash") +
-  scale_x_discrete(labels=c("1" = "10th percentile", "5" = "50th percentile",
-                            "10" = "90th percentile")) +
+  scale_x_discrete(labels=c("1" = "≤ 10th percentile", "5" = "50th-60th percentile",
+                            "10" = "≥ 90th percentile")) +
   scale_fill_brewer(name = "Blues") +
   ggtitle("BIP FADS1 PES - HDL")
 
@@ -243,8 +243,8 @@ SZ_HDL <- ggplot(HDL_df, aes(x=SZ_FADS1_PES, y=f.30760.0.0,
   labs(fill = "Score name") +
   theme(legend.position = "none") +
   geom_hline(yintercept = 1.478, linetype = "longdash") +
-  scale_x_discrete(labels=c("1" = "10th percentile", "5" = "50th percentile",
-                            "10" = "90th percentile")) +
+  scale_x_discrete(labels=c("1" = "≤ 10th percentile", "5" = "50th-60th percentile",
+                            "10" = "≥ 90th percentile")) +
   scale_fill_brewer(palette = "Blues") +
   ggtitle("SZ FADS1 PES - HDL")
 
