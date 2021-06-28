@@ -75,12 +75,16 @@ HDL_df <- HDL_df %>%
 HDL_df$Low_GReX <- ifelse(HDL_df$FADS1_GReX_AVG == 1, 1, 0)
 HDL_df$High_PES <- ifelse(HDL_df$SZ_FADS1 == 10, 1, 0)
 HDL_df$High_BIP_PES <- ifelse(HDL_df$BIP_FADS1 == 10, 1, 0)
-HDL_df$High_PES_low_GReX <- ifelse(HDL_df$FADS1_GReX_AVG == 1 & HDL_df$SZ_FADS1 == 1, 1, 0)
-
+HDL_df$High_SZ_PES_low_GReX <- ifelse(HDL_df$FADS1_GReX_AVG == 1 & HDL_df$SZ_FADS1 == 1, 1, 0)
 HDL_df$High_BIP_PES_low_GReX <- ifelse(HDL_df$FADS1_GReX_AVG == 1 & HDL_df$BIP_FADS1 == 1, 1, 0)
 
-HDL_SZ_GReX <- lm(f.30760.0.0 ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
-                 PC8 + PC9 + PC10 + High_PES_low_GReX +  Batch, data = HDL_df)
+## Identify individuals with high PES and low GReX vs low GReX alone
+
+Subsetted_SZ_HDL_df <- HDL_df %>% filter(Low_GReX == 1 | High_PES == 1)
+
+
+HDL_SZ_both_GReX <- lm(f.30760.0.0 ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
+                 PC8 + PC9 + PC10 + High_SZ_PES_low_GReX +  Batch, data = Subsetted_SZ_HDL_df)
 
 HDL_GReX <- lm(f.30760.0.0 ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
                     PC8 + PC9 + PC10 + Low_GReX +  Batch, data = HDL_df)
@@ -147,8 +151,8 @@ HDL_BIP_network <- lm(f.30760.0.0 ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5
 
 ## Test for interaction effects
 
-GReX_int_HDL <- lm(Norm_resid ~ PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
-                     PC8 + PC9 + PC10 + FADS1_GReX_AVG*SZ_FADS1 +  Batch, data = HDL_df)
+GReX_int_HDL <- lm(f.30760.0.0 ~ PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
+                     PC8 + PC9 + PC10 + FADS1_GReX_AVG + SZ_FADS1 +  Batch, data = HDL_df)
 
 ## Triglycerides ##
 
