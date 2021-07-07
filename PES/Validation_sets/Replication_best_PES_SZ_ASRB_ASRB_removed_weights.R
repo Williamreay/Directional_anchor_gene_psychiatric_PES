@@ -154,9 +154,45 @@ rownames(SZ_results) <- Scores_to_test
 
 write.csv(SZ_results, file="Best_DA_gene_PES/SZ_best_con_or_lib/ASRB_SZ_VALIDATION/Results/GoM_CD_CS_ASRB_best_PES_PRS_results.csv", quote = F, row.names = T)
 
-## Test association with clozapine prescription - proxy for treatment resistance
+## Test association of PES/PRS with cognitive deficit relative to controls
 
-Cloz_df <- fread("Best_DA_gene_PES/SZ_best_con_or_lib/ASRB_SZ_VALIDATION/Clozapine_ASRB_new_df.txt", header = T)
+CD_HC_df <- read_excel("Best_DA_gene_PES/SZ_best_con_or_lib/ASRB_SZ_VALIDATION/CD_vs_HC.xlsx")
+
+
+SZ_merged_GoM_HC <- Reduce(function(dtf1, dtf2) merge(dtf1, dtf2, by = "IID"),
+                        list(All_SZ_scores, CD_HC_df, SZ_pheno))
+
+## Scale PES and PRS to have mean zero and unit variance (s.d. = 1)
+
+SZ_merged_GoM_HC[,c(6, 12, 18, 24, 30, 36, 42)] <- lapply(SZ_merged_GoM_HC[,c(6, 12, 18, 24, 30, 36, 42)], function(x) c(scale(x)))
+
+## Function
+
+PES_PRS_SZ_ASRB_GoM_HC <- function(v){
+  Score_model <- glm(glue::glue('GoM_coded ~ SEX.x + age + PC1.x + PC2.x + PC3.x + {v}'), family = "binomial", data = SZ_merged_GoM_HC)
+  return(summary(Score_model)) 
+}
+
+## Iterate function over list of genes
+
+SZ_score <- sapply(Scores_to_test, PES_PRS_SZ_ASRB_GoM_HC)
+
+## Extract beta, se, z, and p value for each gene
+
+SZ_extract <- apply(SZ_score, 2, function(x) return(as.data.frame(x$coefficients)[7,1:4]))
+
+SZ_results <- data.frame()
+
+for (i in 1:length(SZ_extract)) {
+  SZ_results <- rbind(SZ_results, SZ_extract[[i]])
+}
+rownames(SZ_results) <- Scores_to_test
+
+write.csv(SZ_results, file="Best_DA_gene_PES/SZ_best_con_or_lib/ASRB_SZ_VALIDATION/Results/GoM_CD_vs_HC_ASRB_best_PES_PRS_results.csv", quote = F, row.names = T)
+
+## Test association with clozapine prescription - proxy for treatment resistance vs control
+
+Cloz_df <- read_excel("Best_DA_gene_PES/SZ_best_con_or_lib/ASRB_SZ_VALIDATION/Clozapine_vs_HC.xlsx")
 
 SZ_merged_Cloz <- Reduce(function(dtf1, dtf2) merge(dtf1, dtf2, by = "IID"),
                         list(All_SZ_scores, Cloz_df, SZ_pheno))
