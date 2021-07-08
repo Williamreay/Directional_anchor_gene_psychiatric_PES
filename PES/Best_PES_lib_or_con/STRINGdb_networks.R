@@ -22,7 +22,7 @@ Candidates <- fread("Final_list_of_candidate_DAG_SZ_and_BIP.txt", header = F)
 
 STRINGdb_v11 <- fread("9606.protein.links.detailed.v11.0.txt.gz", header = T)
 
-## Filter high confidence edges (combined score > 0.7) - based on experimental and database evidence
+## Filter high confidence edges (experimental or database > 0.7) - based on experimental and database evidence
 
 High_conf_STRINGdb_v11_exp_db <- STRINGdb_v11 %>% select(protein1, protein2, experimental, database) %>% filter(experimental > 700 | database > 700) 
 

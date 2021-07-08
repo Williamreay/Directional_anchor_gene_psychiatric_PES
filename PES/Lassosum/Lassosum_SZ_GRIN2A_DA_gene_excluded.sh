@@ -12,5 +12,5 @@ while read GWAS_FILE SCORE_NAME;
     --ref ~/ukbb2/SZ_and_BIP_UKBB_subsets/BIP_TRAIN_cohort/Merged_BIP_TRAIN_UKBB_cohort \
     --LDblocks EUR.hg19 --pheno ../SZ_phenotypes/SZ_UKBB_pheno.txt --keep.ref ../SZ_phenotypes/SZ_lassosum_ref_keep.txt \
     --covar ../SZ_phenotypes/Covariates_SZ_UKBB.txt --test.bfile ~/ukbb2/SZ_and_BIP_UKBB_subsets/SZ_cohort/Merged_SZ_UKBB_cohort \
-    --nthreads 6 --out SZ_UKBB_LASSO_${SCORE_NAME};
-done < SZ_UKBB_lassosum_input.txt
+    --nthreads 6 --out SZ_UKBB_lassosum_liberal/SZ_UKBB_LASSO_${SCORE_NAME};
+done < DA_gene_removed/GRIN2A_list.txt

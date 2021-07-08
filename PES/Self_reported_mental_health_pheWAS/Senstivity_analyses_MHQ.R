@@ -156,7 +156,7 @@ Heatmap(Input_mat, name = "Z", rect_gp = gpar(col = "white", lwd = 2),
         )
 
 
-Input <- `dimnames<-`(`dim<-`(as.numeric(Input), dim(Input)), dimnames(Input))
+
 
 
 
