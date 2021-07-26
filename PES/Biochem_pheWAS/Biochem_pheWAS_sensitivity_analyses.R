@@ -69,6 +69,23 @@ Run_BIP <- mapply(BIP_PRS_adjustment, biochem_col = BIP_testing, score_col=BIP_s
 
 Run_BIP_extract <- apply(Run_BIP, 2, function(x) return(as.data.frame(x$coefficients)[15, 1:4]))
 
+## Interaction model
+
+BIP_PRS_interaction <- function(biochem_col, score_col, df) {
+  biochem_df <- df[!is.na(df[[biochem_col]]),]
+  biochem_df$scaled_score <- as.numeric(scale(biochem_df[[score_col]]))
+  fmla <- as.formula(paste(biochem_col, "~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
+              PC8 + PC9 + PC10 + scaled_score*BIP_PRS +  Batch"))
+  mod <- lm(fmla, data = biochem_df)
+  return(summary(mod))
+}
+
+Run_BIP_int <- mapply(BIP_PRS_interaction, biochem_col = BIP_testing, score_col=BIP_scores, 
+                  MoreArgs = list(Senstivity_merged),
+                  SIMPLIFY = TRUE)
+
+Run_BIP_extract_int <- apply(Run_BIP_int, 2, function(x) return(as.data.frame(x$coefficients)[123, 1:4]))
+
 ## SZ
 
 SZ_testing <- fread("Biochem_sensitivity_analyses/SZ_list_to_test.txt", header = T)
@@ -87,6 +104,21 @@ SZ_PRS_adjustment <- function(biochem_col, score_col, df) {
 Run_SZ <- sapply(SZ_testing, SZ_PRS_adjustment,  score_col="SZ_FADS1_PES", df=Senstivity_merged)
 
 Run_SZ_extract <- apply(Run_SZ, 2, function(x) return(as.data.frame(x$coefficients)[15, 1:4]))
+
+## Interaction term
+
+SZ_PRS_int <- function(biochem_col, score_col, df) {
+  biochem_df <- df[!is.na(df[[biochem_col]]),]
+  biochem_df$scaled_score <- as.numeric(scale(biochem_df[[score_col]]))
+  fmla <- as.formula(paste(biochem_col, "~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
+              PC8 + PC9 + PC10 + SZ_PRS*scaled_score +  Batch"))
+  mod <- lm(fmla, data = biochem_df)
+  return(summary(mod))
+}
+
+Run_SZ_int <- sapply(SZ_testing, SZ_PRS_int,  score_col="SZ_FADS1_PES", df=Senstivity_merged)
+
+Run_SZ_extract_int <- apply(Run_SZ_int, 2, function(x) return(as.data.frame(x$coefficients)[123, 1:4]))
 
 ## Test natural log transformation of outcome variable
 
@@ -250,5 +282,4 @@ SZ_HDL <- ggplot(HDL_df, aes(x=SZ_FADS1_PES, y=f.30760.0.0,
 
 
 HDL_all <- ggarrange(BIP_HDL, SZ_HDL)
-
 

@@ -245,18 +245,18 @@ No_report_MH_cases_removed$BIP <- 0
 
 ## Select double the number of controls for each cohort
 ## SZ - N = 1262
-## BIP training - N = 2318
-## BIP test - N = 996
+## BIP training - N = 2322
+## BIP test - N = 992
 
 SZ_controls <- No_report_MH_cases_removed[1:1262, ]
 
 SZ_controls <- SZ_controls %>% select(f.eid, SZ)
 
-BIP_training_controls <- No_report_MH_cases_removed[25000:27317, ]
+BIP_training_controls <- No_report_MH_cases_removed[25000:27321, ]
 
 BIP_training_controls <- BIP_training_controls %>% select(f.eid, BIP)
 
-BIP_test_controls <- No_report_MH_cases_removed[40000:40995, ]
+BIP_test_controls <- No_report_MH_cases_removed[40000:40991, ]
 
 BIP_test_controls <- BIP_test_controls %>% select(f.eid, BIP)
 
