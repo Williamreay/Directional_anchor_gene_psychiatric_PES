@@ -30,7 +30,7 @@ colnames(All_BIP_scores) <- Colnames_all_BIP_scores
 
 ## Read in phenotype and covariate data
 
-BIP_pheno <- fread("UKBB_phenotypes/BIP_phenotypes/BIP_TEST_UKBB_pheno.txt", header = T)
+BIP_pheno <- fread("UKBB_phenotypes/BIP_phenotypes/BIP_TEST_double_N_random_control_UKBB.txt", header = T)
 
 BIP_cov <- fread("UKBB_phenotypes/BIP_phenotypes/Covariates_TEST_BIP_UKBB.txt", header = T)
 
@@ -54,7 +54,7 @@ Scores_to_test <- as.list(colnames(BIP_merged[,c(5, 10, 15, 20, 25, 30, 35)]))
 ## Function
 
 PES_PRS_BIP_UKBB <- function(v){
-  Score_model <- glm(glue::glue('BIP ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + {v} + Batch'), family = "binomial", data = BIP_merged)
+  Score_model <- glm(glue::glue('BIP ~ Sex.x + Age.x + PC1.x + PC2.x + PC3.x + PC4.x + PC5.x + {v} + Batch.x'), family = "binomial", data = BIP_merged)
   return(summary(Score_model)) 
 }
 
@@ -79,8 +79,8 @@ write.csv(BIP_results, file="Best_DA_gene_PES/BIP_best_con_or_lib/UKBB_BIP_VALID
 ## Get variance explained on the liability scale (0.7% prevalence)
 
 BIP_PES_PRS_r2 <- function(v, k, p){
-  Null_model <- glm(BIP ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch, family = "binomial", data = BIP_merged)
-  Score_model <- glm(glue::glue('BIP ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch + {v}'), family = "binomial", data = BIP_merged)
+  Null_model <- glm(BIP ~ Sex.x + Age.x + PC1.x + PC2.x + PC3.x + PC4.x + PC5.x + Batch.x, family = "binomial", data = BIP_merged)
+  Score_model <- glm(glue::glue('BIP ~ Sex.x + Age.x + PC1.x + PC2.x + PC3.x + PC4.x + PC5.x + Batch.x + {v}'), family = "binomial", data = BIP_merged)
   R2 <- nagelkerke(Score_model, null = Null_model)
   ## c.f. https://github.com/kn3in/ABC/blob/master/functions.R
   x <- qnorm(1 - k)

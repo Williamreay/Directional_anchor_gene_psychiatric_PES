@@ -75,7 +75,7 @@ for (i in 1:length(BIP_extract)) {
 }
 rownames(BIP_results) <- Scores_to_test
 
-write.csv(BIP_results, file="Results/Lassosum_BIP_UKBB_PES_PRS_results.csv", quote = F, row.names = T)
+write.csv(BIP_results, file="Results/Conservative_Lassosum_BIP_UKBB_PES_PRS_results.csv", quote = F, row.names = T)
 
 
 ## Get variance explained on the liability scale (1% prevalence)
@@ -106,7 +106,7 @@ for (i in 1:length(BIP_r2)) {
 }
 rownames(R2_liability_results) <- Scores_to_test
 
-write.csv(R2_liability_results, file="Results/Lassosum_BIP_Liability_scale_r2_PES_PRS.csv", row.names = T, quote = F)
+write.csv(R2_liability_results, file="Results/Conservative_Lassosum_BIP_Liability_scale_r2_PES_PRS.csv", row.names = T, quote = F)
 
 
 ## Test covariation of RPS17 PES with PRS at same threshold

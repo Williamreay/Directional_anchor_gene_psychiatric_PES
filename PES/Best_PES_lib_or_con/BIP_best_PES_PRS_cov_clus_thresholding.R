@@ -38,11 +38,11 @@ BIP_merged$Batch <- as.factor(BIP_merged$Batch)
 
 ## Scale PES and PRS to have mean zero and unit variance (s.d. = 1)
 
-BIP_merged[,c(5, 10, 15, 20, 25, 30, 32)] <- lapply(BIP_merged[,c(5, 10, 15, 20, 25, 30, 32)], function(x) c(scale(x)))
+BIP_merged[,c(2, 4, 6, 8, 10, 12, 14)] <- lapply(BIP_merged[,c(2, 4, 6, 8, 10, 12, 14)], function(x) c(scale(x)))
 
 ## Define function to adjust each PES for PRS - for significant PES - PRS pairs perform a chi-square test of resid dev
 
-Scores_to_test <- as.list(colnames(BIP_merged[,c(5, 15, 20, 25, 30, 32)]))
+Scores_to_test <- as.list(colnames(BIP_merged[,c(2, 4, 6, 8, 10, 14)]))
 
 PRS_cov <- function(v){
   Score_model <- glm(glue::glue('BIP ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + {v} + Batch + PRS'), family = "binomial", data = BIP_merged)
@@ -72,9 +72,9 @@ BIP_merged <- rename(BIP_merged, "CACNA1C PES"="CACNA1C_PES",
 
 ## Construct correlation plot
 
-Cor_BIP <- cor(BIP_merged[,c(5, 10, 15, 20, 25, 30, 32)])
+Cor_BIP <- cor(BIP_merged[,c(2, 4, 6, 8, 10, 12, 14)])
 
-pval <- psych::corr.test(BIP_merged[,c(5, 10, 15, 20, 25, 30, 32)], adjust = "none")$p
+pval <- psych::corr.test(BIP_merged[,c(2, 4, 6, 8, 10, 12, 14)], adjust = "none")$p
 
 Sig_corr_plot <- corrplot(Cor_BIP, tl.cex = 0.5, p.mat = pval, insig = "blank",
                           sig.level = 0.05, type="upper", method="number",
@@ -91,7 +91,7 @@ Decile_df <- BIP_merged %>%
 Top_decile_PES <- Decile_df %>%
   mutate_at(vars(ends_with("PES")), .funs = list(~if_else(. == 10,1, 0)))
 
-Top_decile_PES$PES_decile_sum <- rowSums(Top_decile_PES[, c(5, 15, 20, 25, 30, 32)])
+Top_decile_PES$PES_decile_sum <- rowSums(Top_decile_PES[, c(2, 4, 6, 8, 10, 14)])
 
 Top_decile_PES$Binary_decile <- ifelse(Top_decile_PES$PES_decile_sum > 0, 1, 0)
 
@@ -138,7 +138,7 @@ BIP_top_decile_PES <- BIP_Decile_df %>%
   mutate_at(vars(ends_with("PES")), .funs = list(~if_else(. == 10,1, 0)))
 
 
-BIP_top_decile_PES$PES_decile_sum <- rowSums(BIP_top_decile_PES[, c(5, 15, 20, 25, 30, 32)])
+BIP_top_decile_PES$PES_decile_sum <- rowSums(BIP_top_decile_PES[, c(2, 4, 6, 8, 10, 14)])
 
 BIP_top_decile_PES$Binary_decile <- ifelse(BIP_top_decile_PES$PES_decile_sum > 0, 1, 0)
 
@@ -210,9 +210,9 @@ quantile(BIP_merged$GRIN2A_residuals, probs = seq(0, 1, 0.1))
 
 quantile(BIP_merged$PRS, probs = seq(0, 1, 0.1))
 
-BIP_merged$Plot_var_col <- as.factor(ifelse(BIP_merged$GRIN2A_PES > 1.31039008 & BIP_merged$GRIN2A_residuals > 1.29834122, 1, 0))
+BIP_merged$Plot_var_col <- as.factor(ifelse(BIP_merged$GRIN2A_PES > 1.31265716 & BIP_merged$GRIN2A_residuals > 1.29474340, 1, 0))
 
-BIP_merged$Plot_var_col_2 <- as.factor(ifelse(BIP_merged$GRIN2A_PES > 1.31039008 & BIP_merged$PRS < -1.26673774 , 1, 0))
+BIP_merged$Plot_var_col_2 <- as.factor(ifelse(BIP_merged$GRIN2A_PES > 1.31265716 & BIP_merged$PRS < -1.27051916 , 1, 0))
 
 ggplot(data = BIP_merged,
        aes(x = GRIN2A_PES, y=GRIN2A_residuals, colour = Plot_var_col)) +
