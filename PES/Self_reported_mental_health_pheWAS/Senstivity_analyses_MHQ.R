@@ -51,7 +51,7 @@ Dep$SZ_CACNA1C_PES <- as.numeric(scale(Dep$SZ_CACNA1C_PES))
 Dep$SZ_PRS <- as.numeric(scale(Dep$SZ_PRS))
 
 Dep_test <- glm(Depression ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
-  PC8 + PC9 + PC10 + Batch + SZ_CACNA1C_PES + SZ_PRS, family = "binomial",
+  PC8 + PC9 + PC10 + Batch + SZ_PRS + SZ_CACNA1C_PES, family = "binomial",
   data = Dep)
 
 anova(Dep_test, test="Chisq")
@@ -64,31 +64,18 @@ OCD$SZ_RPS17_PES <- as.numeric(scale(OCD$SZ_RPS17_PES))
 OCD$SZ_PRS <- as.numeric(scale(OCD$SZ_PRS))
 
 OCD_test <- glm(OCD ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
-                  PC8 + PC9 + PC10 + Batch + SZ_RPS17_PES + SZ_PRS, family = "binomial",
+                  PC8 + PC9 + PC10 + Batch + SZ_PRS + SZ_RPS17_PES, family = "binomial",
                 data = OCD)
 
 anova(OCD_test, test="Chisq")
 
-## BIP GRIN2A PES and anxiety
-
-Anx <- Merged_MHQ_scoring %>% filter(No_mental_health == 0 | Anx_nerves_or_GAD == 1)
-
-Anx$BIP_GRIN2A_PES <- as.numeric(scale(Anx$BIP_GRIN2A_PES))
-Anx$BIP_PRS <- as.numeric(scale(Anx$BIP_PRS))
-
-BIP_test <- glm(Anx_nerves_or_GAD ~ Sex*Age + Age2 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
-                  PC8 + PC9 + PC10 + Batch + BIP_GRIN2A_PES + BIP_PRS, family = "binomial",
-                data = OCD)
-
-anova(BIP_test, test="Chisq")
-
 ## Make heatmap of self-report Z scores
 
-Hm_input <- fread("Results/FDR_corrected_results.csv", header = T)
+Hm_input <- fread("FDR_FWER_MHQ_phenotypes.csv", header = T)
 
-Hm_input <- Hm_input %>% select(Z, Disorder, Score)
+Hm_input <- Hm_input %>% select(z, Phenotype, Score)
 
-Input <- dcast(Hm_input, Disorder ~ Score, value.var = "Z")
+Input <- dcast(Hm_input, Phenotype ~ Score, value.var = "z")
 
 Input_mat <- as.matrix(Input)
 
@@ -108,34 +95,6 @@ colnames(Input_mat) <- c("BIP CACNA1C PES", "BIP FADS1 PES",
 Input_mat <- Input_mat[, -1]
 
 Input_mat <- `dimnames<-`(`dim<-`(as.numeric(Input_mat), dim(Input_mat)), dimnames(Input_mat))
-
-Pval_input <- Hm_input %>% select(Score, P, Disorder)
-
-P_Input <- dcast(Pval_input, Disorder ~ Score, value.var = "P")
-
-Input_P_mat <- as.matrix(P_Input)
-
-rownames(Input_P_mat) <- c("ADHD", "Agoraphobia", "Anorexia nervosa",
-                         "Anxiety/GAD", "ASD", "Bulimia nervosa", 
-                         "Depression", "OCD", "Other phobia", "Other psychosis",
-                         "Over eating/binge eating", "Paniac attack", "Personality disorder",
-                         "Social anxiety/Social phobia")
-
-Input_P_mat <- Input_P_mat[, -1]
-
-colnames(Input_P_mat) <- c("BIP CACNA1C PES", "BIP FADS1 PES",
-                         "BIP FES PES", "BIP GRIN2A PES", "BIP PCCB PES",
-                         "BIP PRS", "BIP RPS17 PES", "SZ CACNA1C PES",
-                         "SZ FADS1 PES", "SZ FES PES", "SZ GRIN2A PES",
-                         "SZ PCCB PES", "SZ PRS", "SZ RPS17 PES")
-
-
-Input_P_mat <- `dimnames<-`(`dim<-`(as.numeric(Input_P_mat), dim(Input_P_mat)), dimnames(Input_P_mat))
-
-corrplot(Input_mat, is.corr = F,tl.col = "black",
-        p.mat = Input_P_mat,
-        insig = "blank", tl.cex = 0.6, method = "square",
-        sig.level = c(0.005))
 
 Heatmap(Input_mat, name = "Z", rect_gp = gpar(col = "white", lwd = 2), 
         show_column_dend = TRUE, show_row_dend = TRUE, clustering_distance_rows = "pearson",

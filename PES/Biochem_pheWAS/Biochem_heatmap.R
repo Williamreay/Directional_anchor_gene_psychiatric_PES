@@ -16,17 +16,17 @@ library(circlize)
 
 setwd("~/Desktop/SZ_PES_mtCOJO_norm/Best_DA_gene_PES/UKBB_MHQ_no_self_reported_biochem/")
 
-Hm_input <- fread("All_results_both_sexes_FWER_FDR.csv", header = T)
+Hm_input <- read_excel("Combined_results_final_biochem_pheWAS.xlsx")
 
 Biochem <- fread("Biochem_names.txt", header = T)
 
+Biochem <- Biochem %>% filter(Biochem != "Oestradiol")
+
 Hm_input <- merge(Hm_input, Biochem, by = "field_ID")
 
-Hm_input <- Hm_input %>% select(Tstat, Score, Biochem_trait)
+Hm_input <- Hm_input %>% select(t, Score, Biochem_trait.x)
 
-Hm_input <- rename(Hm_input, "t"="Tstat")
-
-Input <- dcast(Hm_input, Biochem_trait ~ Score, value.var = "t")
+Input <- dcast(Hm_input, Biochem_trait.x ~ Score, value.var = "t")
 
 Input_mat <- as.matrix(Input)
 
