@@ -440,17 +440,17 @@ GRIN2A_output <- rename(GRIN2A_output, "A1"="A1.x", "GRIN2A_PES"="GRIN2A$best.be
 write.table(GRIN2A_output, file="~/Desktop/SZ_PES_mtCOJO_norm/Best_DA_gene_PES/HCS_cohort_profiling/CHR_BP_HCS_weights/CHR_BP_GRIN2A_PES_BIP_penalised_reg_lib.txt",
             row.names = F, quote = F)
 
-## RPS17 - penalised regression (conservative) ##
+## RPS17 - penalised regression (liberal) ##
 
-RPS17 <- readRDS("~/Desktop/SZ_PES_mtCOJO_norm/PES/Lassosum_BIP_UKBB_TRAIN/BIP_TRAIN_UKBB_LASSO_BIP_TRAIN_RPS17_network.validate.rds")
+RPS17 <- readRDS("~/Desktop/SZ_PES_mtCOJO_norm/Liberal_genic_boundaries_DA_gene_PES/BIP_TRAIN_lassosum_liberal/BIP_TRAIN_UKBB_LASSO_RPS17.validate.rds")
 
-RPS17_pipeline <- readRDS("~/Desktop/SZ_PES_mtCOJO_norm/PES/Lassosum_BIP_UKBB_TRAIN/BIP_TRAIN_UKBB_LASSO_BIP_TRAIN_RPS17_network.lassosum.pipeline.rds")
+RPS17_pipeline <- readRDS("~/Desktop/SZ_PES_mtCOJO_norm/Liberal_genic_boundaries_DA_gene_PES/BIP_TRAIN_lassosum_liberal/BIP_TRAIN_UKBB_LASSO_RPS17.lassosum.pipeline.rds")
 
 ## Summary statistics for RPS17
 
 RPS17_weights <- cbind(RPS17_pipeline$sumstats, RPS17$best.beta)
 
-RPS17_sumstats <- fread("~/Desktop/SZ_PES_mtCOJO_norm/PES/Pathway_specific_variants/BIP_RPS17_network.txt", header = T)
+RPS17_sumstats <- fread("~/Desktop/SZ_PES_mtCOJO_norm/Liberal_genic_boundaries_DA_gene_PES/Liberal_boundaries_pathway_specific_variants/Liberal_bound_BIP_RPS17", header = T)
 
 RPS17_sumstats$order <-  seq.int(nrow(RPS17_sumstats))
 
@@ -463,7 +463,7 @@ RPS17_output <- rename(RPS17_output, "A1"="A1.x", "RPS17_PES"="RPS17$best.beta",
 write.table(RPS17_output, file="~/Desktop/SZ_PES_mtCOJO_norm/Best_DA_gene_PES/HCS_cohort_profiling/CHR_BP_HCS_weights/CHR_BP_RPS17_PES_BIP_penalised_reg_cons.txt",
             row.names = F, quote = F)
 
-## PCCB - penalised regression (conservative) ##
+## PCCB - penalised regression (liberal) ##
 
 PCCB <- readRDS("~/Desktop/SZ_PES_mtCOJO_norm/PES/Lassosum_BIP_UKBB_TRAIN/BIP_TRAIN_UKBB_LASSO_BIP_TRAIN_PCCB_network.validate.rds")
 
@@ -473,7 +473,7 @@ PCCB_pipeline <- readRDS("~/Desktop/SZ_PES_mtCOJO_norm/PES/Lassosum_BIP_UKBB_TRA
 
 PCCB_weights <- cbind(PCCB_pipeline$sumstats, PCCB$best.beta)
 
-PCCB_sumstats <- fread("~/Desktop/SZ_PES_mtCOJO_norm/PES/Pathway_specific_variants/BIP_PCCB_network.txt", header = T)
+PCCB_sumstats <- fread("~/Desktop/SZ_PES_mtCOJO_norm/Liberal_genic_boundaries_DA_gene_PES/Liberal_boundaries_pathway_specific_variants/Liberal_bound_BIP_PCCB", header = T)
 
 PCCB_sumstats$order <-  seq.int(nrow(PCCB_sumstats))
 

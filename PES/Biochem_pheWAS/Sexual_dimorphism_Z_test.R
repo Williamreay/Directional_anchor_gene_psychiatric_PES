@@ -15,19 +15,19 @@ setwd("~/Desktop/SZ_PES_mtCOJO_norm/Best_DA_gene_PES/UKBB_MHQ_no_self_reported_b
 
 ## Read in male results
 
-Male <- read_excel("Combined_male_results.xlsx")
+Male <- read_excel("All_male_combined.xlsx")
 
 ## Read in female results
 
-Female <- read_excel("Combined_female_results.xlsx")
+Female <- read_excel("All_female_combined.xlsx")
 
 ## Combine df
 
-Merged_both_sexes <- merge(Male, Female, by=c("Biochem", "Score"))
+Merged_both_sexes <- merge(Male, Female, by=c("field_ID", "Score"))
 
 ## Perform Z test - c.f. https://doi.org/10.1016/j.biopsych.2020.12.024
 
-Merged_both_sexes$Z_dimorphism <- ((Merged_both_sexes$Female_beta - Merged_both_sexes$Male_beta)/sqrt(Merged_both_sexes$Female_se^2+Merged_both_sexes$Male_SE^2))
+Merged_both_sexes$Z_dimorphism <- ((Merged_both_sexes$Female_beta - Merged_both_sexes$Male_beta)/sqrt(Merged_both_sexes$Female_se^2+Merged_both_sexes$Male_se^2))
 
 Merged_both_sexes$P_dimorphism <- pnorm(abs(Merged_both_sexes$Z_dimorphism), lower.tail=FALSE) * 2
 
@@ -48,11 +48,11 @@ Significant_dimorphism$Abs_Z <- abs(Significant_dimorphism$Z_dimorphism)
 
 ## Order and retain largest value
 
-Significant_dimorphism <- as.data.frame(Significant_dimorphism %>% group_by(Biochem_trait) %>% top_n(1, Abs_Z))
+Significant_dimorphism <- as.data.frame(Significant_dimorphism %>% group_by(field_ID) %>% top_n(1, Abs_Z))
 
 ## Plot Z
 
-ggplot(data = Significant_dimorphism, aes(x=Biochem_trait, y=Z_dimorphism, fill = Biochem_trait)) +
+ggplot(data = Significant_dimorphism, aes(x=field_ID, y=Z_dimorphism, fill = field_ID)) +
   geom_bar(stat="identity", color="black") +
   coord_flip() +
   theme_bw() +

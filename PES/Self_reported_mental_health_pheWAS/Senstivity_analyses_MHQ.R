@@ -111,6 +111,9 @@ Heatmap(Input_mat, name = "Z", rect_gp = gpar(col = "white", lwd = 2),
           if(Input_mat[i, j] > 1.96 && Input_mat[i, j] < 2.77) {
             grid.text("*", x, y)
           }
+          if(Input_mat[i, j] < -1.96) {
+            grid.text("*", x, y)
+          }
         }
         )
 

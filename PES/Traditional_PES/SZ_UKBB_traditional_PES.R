@@ -33,9 +33,9 @@ SZ_pheno <- fread("../../UKBB_phenotypes/SZ_phenotypes/SZ_UKBB_pheno.txt", heade
 
 SZ_cov <- fread("../../UKBB_phenotypes/SZ_phenotypes/Covariates_SZ_UKBB.txt", header = T)
 
-## Read in PRS (P < 0.05)
+## Read in PRS
 
-PRS <- fread("../../PES/UKBB_SZ/SZ_UKBB_SZ_PGC3_PRS.all_score", header = T)
+PRS <- fread("../../Best_DA_gene_PES/SZ_best_con_or_lib/SZ_UKBB_TRAIN_score_files/SZ_UKBB_LASSO_SZ_PGC3_PRS.validate.results.txt", header = T)
 
 ## Merge all four df
 
@@ -46,11 +46,11 @@ SZ_merged$Batch <- as.factor(SZ_merged$Batch)
 
 ## Scale PES and PRS to have mean zero and unit variance (s.d. = 1)
 
-SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,40)] <- lapply(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,40)], function(x) c(scale(x)))
+SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,41)] <- lapply(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,41)], function(x) c(scale(x)))
 
 ## List of sets to test
 
-Scores_to_test <- as.list(colnames(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,40)]))
+Scores_to_test <- as.list(colnames(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,41)]))
 
 ## Function
 
@@ -110,33 +110,33 @@ write.csv(R2_liability_results, file="Results/SZ_Liability_scale_r2_PES_PRS.csv"
 
 ## Spermatogenesis
 
-Spermatogenesis <- glm(SZ ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch + PRS_0_05 + SPERMATOGENESIS_0_005,
+Spermatogenesis <- glm(SZ ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch + PRS + SPERMATOGENESIS_0_005,
                        family="binomial", data = SZ_merged)
 
 anova(Spermatogenesis, test="Chisq")
 
 ## Neuronal system
 
-Neuronal_system <- glm(SZ ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch + PRS_0_05 + Neuronal_system_1,
+Neuronal_system <- glm(SZ ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch + PRS + Neuronal_system_1,
                        family="binomial", data = SZ_merged)
 
 anova(Neuronal_system, test="Chisq")
 
 ## Insulin secretion
 
-Insulin <- glm(SZ ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch + PRS_0_05 + Insulin_secretion_0_5,
+Insulin <- glm(SZ ~ Sex + Age + PC1 + PC2 + PC3 + PC4 + PC5 + Batch + PRS + Insulin_secretion_0_5,
                        family="binomial", data = SZ_merged)
 
 anova(Insulin, test="Chisq")
 
 ## Correlation plot
 
-Cor_SZ <- cor(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,40)])
+Cor_SZ <- cor(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,41)])
 
-pval <- psych::corr.test(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,40)], adjust = "none")$p
+pval <- psych::corr.test(SZ_merged[,c(3,7,10,14,18,21,25,29,32,36,41)], adjust = "none")$p
 
 Sig_corr_plot <- corrplot(Cor_SZ, tl.cex = 0.5, p.mat = pval, insig = "blank",
-                          sig.level = 0.05, type="upper", method="square",
+                          sig.level = 0.05, type="upper", method="number",
                           tl.col="black", tl.srt=45)
 
 SZ_results$Scores <- Scores_to_test

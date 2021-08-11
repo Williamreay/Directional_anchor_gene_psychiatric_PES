@@ -152,6 +152,25 @@ table(SZ_Bottom_top_decile_merged$PES_decile_sum)
 
 Bottom_top_decile_merged$PES_decile_sum <- ifelse(Bottom_top_decile_merged$PES_decile_sum > 0, 1, 0)
 
+## High PRS but controls (low PES)
+
+Top_decile_PRS <- Decile_df %>%
+  mutate_at(vars(ends_with("PES")), .funs = list(~if_else(. == 1,1, 0)))
+
+Top_decile_PRS$PES_decile_sum <- rowSums(Top_decile_PRS[, c(2, 4, 6, 11, 16, 21)])
+
+Top_decile_PRS$Low_decile <- ifelse(Top_decile_PRS$PES_decile_sum > 0, 1, 0)
+
+Top_decile_PRS <- Top_decile_PRS %>% filter(PRS == 10)
+
+Top_decile_PRS$SZ <- ifelse(Top_decile_PRS$SZ == 1, "SZ", "HC")
+
+table(Top_decile_PRS$Low_decile, Top_decile_PRS$SZ)
+
+Controls_top_decile <- glm(SZ ~  Low_decile + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 +
+                             PC8 + PC9 + PC10 + Batch + Sex + Age,
+                           family = "binomial", data = Top_decile_PRS)
+
 ## Residualised GRIN2A PES
 
 SZ_merged$Phenotype <- ifelse(SZ_merged$SZ == 1, "SZ", "HC")
